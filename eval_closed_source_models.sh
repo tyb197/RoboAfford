@@ -6,7 +6,7 @@ export OPENAI_BASE_URL="http://104.243.40.194:3000/v1"
 
 # Models list to be evaluated
 MODELS=(
-    # "gpt-4o-2024-08-06"
+    "gpt-4o-2024-08-06"
     "claude-3-5-sonnet-20240620"
     "gemini-2.5-flash-preview-05-20"
     "gemini-2.5-pro-preview-05-06"

@@ -5,19 +5,17 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 from tqdm import tqdm
+import argparse
 
-
-json_path = "./results_open_source_models/qwen25vl-7b-sft.json"
-image_dir = "./images"
-output_dir = "./visualize_results"
-
-
-os.makedirs(output_dir, exist_ok=True)
-
-
-categories = ["object affordance prediction", "object affordance recognition", "spatial affordance localization"]
-for category in categories:
-    os.makedirs(os.path.join(output_dir, category.replace(" ", "_")), exist_ok=True)
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--json_path', type=str, default="./results_open_source_models/qwen25vl-7b.json",
+                       help='Path to the JSON results file')
+    parser.add_argument('--image_dir', type=str, default="./images",
+                       help='Directory containing the input images')
+    parser.add_argument('--output_dir', type=str, default="./visualize_results",
+                       help='Directory to save visualization results')
+    return parser.parse_args()
 
 def is_normalized_coords(points, img_width, img_height):
     for x, y in points:
@@ -57,33 +55,45 @@ def visualize_points(image_path, points, output_path, question=None):
         print(f"Error occurred when processing {image_path}: {str(e)}")
         return False
 
-with open(json_path, 'r') as f:
-    data = json.load(f)
+def main():
+    args = parse_args()
+    
+    os.makedirs(args.output_dir, exist_ok=True)
 
-success_count = 0
-total_count = len(data['detailed_results'])
+    categories = ["object affordance prediction", "object affordance recognition", "spatial affordance localization"]
+    for category in categories:
+        os.makedirs(os.path.join(args.output_dir, category.replace(" ", "_")), exist_ok=True)
 
-with tqdm(data['detailed_results'], desc="Visualization Process") as pbar:
-    for result in pbar:
-        image_name = result['image']
-        category = result['category']
-        question = result['question']
-        
-        pred_points = result['pred_points']
-        if not pred_points:
-            continue
-        
-        category_dir = category.replace(" ", "_")
-        output_filename = f"{os.path.splitext(image_name)[0]}_{category_dir}.png"
-        output_path = os.path.join(output_dir, category_dir, output_filename)
-        
-        image_path = os.path.join(image_dir, image_name)
-        if os.path.exists(image_path):
-            if visualize_points(image_path, pred_points, output_path, question):
-                success_count += 1
-            pbar.set_postfix({"Success": success_count, "Fail": pbar.n - success_count + 1})
-        else:
-            print(f"Image file does not exist: {image_path}")
+    with open(args.json_path, 'r') as f:
+        data = json.load(f)
 
-print(f"\nVisualization Finished! Processed {success_count}/{total_count} results")
-print(f"Results saved: {output_dir}")
+    success_count = 0
+    total_count = len(data['detailed_results'])
+
+    with tqdm(data['detailed_results'], desc="Visualization Process") as pbar:
+        for result in pbar:
+            image_name = result['image']
+            category = result['category']
+            question = result['question']
+            
+            pred_points = result['pred_points']
+            if not pred_points:
+                continue
+            
+            category_dir = category.replace(" ", "_")
+            output_filename = f"{os.path.splitext(image_name)[0]}_{category_dir}.png"
+            output_path = os.path.join(args.output_dir, category_dir, output_filename)
+            
+            image_path = os.path.join(args.image_dir, image_name)
+            if os.path.exists(image_path):
+                if visualize_points(image_path, pred_points, output_path, question):
+                    success_count += 1
+                pbar.set_postfix({"Success": success_count, "Fail": pbar.n - success_count + 1})
+            else:
+                print(f"Image file does not exist: {image_path}")
+
+    print(f"\nVisualization Finished! Processed {success_count}/{total_count} results")
+    print(f"Results saved: {args.output_dir}")
+
+if __name__ == "__main__":
+    main()
