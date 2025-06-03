@@ -9,6 +9,7 @@ conda activate roboafford
 pip install -r requirements.txt
 ```
 The above environment supports evaluation of both closed-source models (GPT-4o, Claude-3.5-Sonnet, Gemini-1.5-Flash, and Gemini-1.5-Pro) and the following open-source models: Qwen2-VL and Qwen2.5-VL.
+
 For other open-source models, we recommend creating separate conda environments for each model following their official GitHub repositories.
 
 ## Evaluation
@@ -30,6 +31,7 @@ For open-source model evaluation, we recommend downloading the checkpoints from 
 - **SpaceMantis**: remyxai/SpaceMantis
 - **RoboPoint**: wentao-yuan/robopoint-v1-vicuna-v1.5-13b
 - **Qwen2.5-VL**: Qwen/Qwen2.5-VL-3B-Instruct, Qwen/Qwen2.5-VL-7B-Instruct
+
 Run the evaluation with:
 ```
 python inference.py \
@@ -41,6 +43,7 @@ python inference.py \
 We provide annotation files in two formats to accommodate different model output formats:
 - **annotations_normxy.json** (values between 0-1)
 - **annotations_absxy.json** (pixel values)
+
 You can specify your preferred format using the `--annotations` argument when running the evaluation. For implementation details, please refer to the `eval_open_source_models.sh` script.
 
 ### Visualization
